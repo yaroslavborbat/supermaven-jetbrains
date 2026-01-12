@@ -1,0 +1,78 @@
+<!-- Plugin Configuration File: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN, cannot be changed between the plugin versions. -->
+    <id>supermaven.supermaven-jetbrains</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
+    <name>Supermaven-jetbrains</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://github.com/yaroslavborbat">YaroslavBorbat</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
+    <description><![CDATA[
+        Enter short description for your plugin here.<br>
+        <em>most HTML tags may be used</em>
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <resource-bundle>messages.MyMessageBundle</resource-bundle>
+    <!-- Extensions defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="SupermavenToolWindow"
+                    factoryClass="supermaven.supermavenjetbrains.SupermavenToolWindowFactory"
+                    icon="AllIcons.Toolwindows.ToolWindowPalette"
+        />
+        <notificationGroup
+                id="SupermavenNotification"
+                displayType="BALLOON"
+                isLogByDefault="true"
+        />
+        <postStartupActivity id="SupermavenProjectActivity"
+                implementation="supermaven.supermavenjetbrains.SupermavenProjectActivity"
+        />
+        <projectConfigurable id="SupermavenSettingsConfigurable"
+                instance="supermaven.supermavenjetbrains.SupermavenSettingsConfigurable"
+                displayName="Supermaven Settings"
+        />
+    </extensions>
+    <actions>
+        <action id="supermaven.supermavenjetbrains.actions.StartAction"
+                class="supermaven.supermavenjetbrains.actions.StartAction"
+                text="Start Supermaven Agent"
+                description="Start supermaven agent"
+        />
+        <action id="supermaven.supermavenjetbrains.actions.StopAction"
+                class="supermaven.supermavenjetbrains.actions.StopAction"
+                text="Stop Supermaven Agent"
+                description="Stop supermaven agent"
+        />
+        <action
+                id="supermaven.supermavenjetbrains.actions.SupermavenToggleAction"
+                class="supermaven.supermavenjetbrains.actions.SupermavenToggleAction"
+                text="Toggle Supermaven"
+                description="Start or stop Supermaven agent"
+        />
+        <action id="supermaven.supermavenjetbrains.actions.UseFreeAction"
+                class="supermaven.supermavenjetbrains.actions.UseFreeAction"
+                text="Use Free Supermaven Version"
+                description="Use free supermaven version"
+        />
+        <action id="supermaven.supermavenjetbrains.actions.UseProAction"
+                class="supermaven.supermavenjetbrains.actions.UseProAction"
+                text="Use Pro Supermaven Version"
+                description="Use pro supermaven version"
+        />
+        <action id="supermaven.supermavenjetbrains.actions.LogoutAction"
+                class="supermaven.supermavenjetbrains.actions.LogoutAction"
+                text="Logout From Supermaven"
+                description="Logout from supermaven"
+        />
+    </actions>
+</idea-plugin>
