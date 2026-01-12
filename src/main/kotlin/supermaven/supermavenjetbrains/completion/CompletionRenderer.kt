@@ -9,11 +9,15 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.ui.JBColor
+import supermaven.supermavenjetbrains.config.Config
+import supermaven.supermavenjetbrains.config.SupermavenConfigService
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Rectangle
 import java.awt.geom.Rectangle2D
+import java.util.Locale
+import java.util.Locale.getDefault
 
 data class CompletionInstance(
     val completionText: String,
@@ -24,6 +28,8 @@ data class CompletionInstance(
 class CompletionRenderer {
     private val inlays = mutableMapOf<Editor, MutableList<Inlay<*>>>()
     private val completionInstances = mutableMapOf<Editor, CompletionInstance>()
+
+    private val config = SupermavenConfigService.getInstance()
 
     fun render(editor: Editor, completionText: String, priorDelete: Int = 0) {
         clear(editor)
@@ -60,7 +66,7 @@ class CompletionRenderer {
         
         val inlayModel = editor.inlayModel
         // Use bright red color for completion to make it very visible
-        val textColor = JBColor.GRAY.brighter()
+        val textColor = getColor()
 
         if (isFloating && firstLine.isNotEmpty()) {
             // Show floating completion at end of line
@@ -107,6 +113,57 @@ class CompletionRenderer {
             }
         }
     }
+
+    private fun getColor(): JBColor {
+        val color = config.state.color
+
+        fun defaultGray(): JBColor {
+            val jbColor = JBColor.GRAY
+            jbColor.brighter()
+            return jbColor
+        }
+
+        return when (color.uppercase(getDefault())) {
+            "GRAY" -> defaultGray()
+            "RED" -> JBColor.RED
+            "GREEN" -> JBColor.GREEN
+            "BLUE" -> JBColor.BLUE
+            "YELLOW" -> JBColor.YELLOW
+            "WHITE" -> JBColor.WHITE
+            "BLACK" -> JBColor.BLACK
+            "PING" -> JBColor.PINK
+            "ORANGE" -> JBColor.ORANGE
+            else -> defaultGray()
+        }
+    }
+
+//    public static final JBColor red;
+//    public static final JBColor RED;
+//    public static final JBColor blue;
+//    public static final JBColor BLUE;
+//    public static final JBColor white;
+//    public static final JBColor WHITE;
+//    public static final JBColor black;
+//    public static final JBColor BLACK;
+//    public static final JBColor gray;
+//    public static final JBColor GRAY;
+//    public static final JBColor lightGray;
+//    public static final JBColor LIGHT_GRAY;
+//    public static final JBColor darkGray;
+//    public static final JBColor DARK_GRAY;
+//    public static final JBColor pink;
+//    public static final JBColor PINK;
+//    public static final JBColor orange;
+//    public static final JBColor ORANGE;
+//    public static final JBColor yellow;
+//    public static final JBColor YELLOW;
+//    public static final JBColor green;
+//    public static final JBColor GREEN;
+//    public static final Color magenta;
+//    public static final Color MAGENTA;
+//    public static final Color cyan;
+//    public static final Color CYAN;
+//    private static final Map<String, Color> defaultThemeColors;
     
     private class SimpleTextRenderer(
         private val text: String,

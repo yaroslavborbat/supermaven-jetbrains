@@ -18,6 +18,7 @@ class SupermavenSettingsConfigurable : Configurable {
     private lateinit var acceptKeyField: JTextField
     private lateinit var clearKeyField: JTextField
     private lateinit var acceptWordKeyField: JTextField
+    private lateinit var colorField: JTextField
     private lateinit var enabledCheckBox: JCheckBox
 
     override fun getDisplayName(): String = "Supermaven Settings"
@@ -51,6 +52,12 @@ class SupermavenSettingsConfigurable : Configurable {
         panel!!.add(acceptWordKeyField, gbc)
 
         gbc.gridy = row++
+        panel!!.add(JLabel("Completion color:"), gbc)
+        gbc.gridy = row++
+        colorField = JTextField()
+        panel!!.add(colorField, gbc)
+
+        gbc.gridy = row++
         enabledCheckBox = JCheckBox("Enabled")
         panel!!.add(enabledCheckBox, gbc)
 
@@ -68,6 +75,7 @@ class SupermavenSettingsConfigurable : Configurable {
         return acceptKeyField.text != state.acceptKey ||
                 clearKeyField.text != state.clearKey ||
                 acceptWordKeyField.text != state.acceptWordKey ||
+                colorField.text != state.color ||
                 enabledCheckBox.isSelected != state.enabled
     }
 
@@ -76,6 +84,7 @@ class SupermavenSettingsConfigurable : Configurable {
             acceptKey = acceptKeyField.text,
             clearKey = clearKeyField.text,
             acceptWordKey = acceptWordKeyField.text,
+            color = colorField.text,
             enabled = enabledCheckBox.isSelected
         )
         DynamicActionManager.instance.registerDynamicActions(config)
@@ -87,6 +96,7 @@ class SupermavenSettingsConfigurable : Configurable {
         acceptKeyField.text = state.acceptKey
         clearKeyField.text = state.clearKey
         acceptWordKeyField.text = state.acceptWordKey
+        colorField.text = state.color
         enabledCheckBox.isSelected = state.enabled
     }
 

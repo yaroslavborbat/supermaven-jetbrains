@@ -10,6 +10,7 @@ data class Config(
     var acceptKey: String = "TAB",
     var clearKey: String = "ESCAPE",
     var acceptWordKey: String = "control RIGHT",
+    var color: String = "GRAY",
     var enabled: Boolean = true
 )
 
