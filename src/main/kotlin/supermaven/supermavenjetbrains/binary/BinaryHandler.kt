@@ -12,11 +12,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 class BinaryHandler(
     private val binaryPath: String,
+    private val wrapCommand: String,
     private val activateRequestCallback: (String, Boolean) -> Unit,
 ) {
 
@@ -49,7 +51,19 @@ class BinaryHandler(
             return
         }
         try {
-            val processBuilder = ProcessBuilder(binaryPath, "stdio")
+
+            val args = mutableListOf<String>()
+
+            if (wrapCommand.isNotEmpty()) {
+                args.addAll(wrapCommand.split(" "))
+            }
+            args.add(binaryPath)
+            args.add("stdio")
+
+            val processBuilder = ProcessBuilder(args)
+            val homeDir = System.getProperty("user.home")
+            processBuilder.directory(File(homeDir))
+
             process = processBuilder.start()
 
             stdin = PrintWriter(BufferedWriter(OutputStreamWriter(process!!.outputStream)), true)
@@ -57,8 +71,8 @@ class BinaryHandler(
 
             logger.info("Started Supermaven binary")
 
-             startReadLoop()
-             sendGreeting()
+            startReadLoop()
+            sendGreeting()
 
         } catch (e: Exception) {
             logger.error("Error starting process", e)

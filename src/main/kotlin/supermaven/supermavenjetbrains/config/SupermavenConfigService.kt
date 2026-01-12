@@ -11,6 +11,8 @@ data class Config(
     var clearKey: String = "ESCAPE",
     var acceptWordKey: String = "control RIGHT",
     var color: String = "GRAY",
+    var ignoreFileTypes: String = "",
+    var execCommandAgentWrapper : String = "",
     var enabled: Boolean = true
 )
 

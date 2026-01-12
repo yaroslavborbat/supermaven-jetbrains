@@ -19,6 +19,8 @@ class SupermavenSettingsConfigurable : Configurable {
     private lateinit var clearKeyField: JTextField
     private lateinit var acceptWordKeyField: JTextField
     private lateinit var colorField: JTextField
+    private lateinit var ignoreFileTypesField: JTextField
+    private lateinit var execCommandAgentWrapperField: JTextField
     private lateinit var enabledCheckBox: JCheckBox
 
     override fun getDisplayName(): String = "Supermaven Settings"
@@ -58,6 +60,18 @@ class SupermavenSettingsConfigurable : Configurable {
         panel!!.add(colorField, gbc)
 
         gbc.gridy = row++
+        panel!!.add(JLabel("Ignore file types:"), gbc)
+        gbc.gridy = row++
+        ignoreFileTypesField = JTextField()
+        panel!!.add(ignoreFileTypesField, gbc)
+
+        gbc.gridy = row++
+        panel!!.add(JLabel("Agent command wrapper (e.g., your-wrapper <agent-path> [agent-args]):"), gbc)
+        gbc.gridy = row++
+        execCommandAgentWrapperField = JTextField()
+        panel!!.add(execCommandAgentWrapperField, gbc)
+
+        gbc.gridy = row++
         enabledCheckBox = JCheckBox("Enabled")
         panel!!.add(enabledCheckBox, gbc)
 
@@ -76,6 +90,8 @@ class SupermavenSettingsConfigurable : Configurable {
                 clearKeyField.text != state.clearKey ||
                 acceptWordKeyField.text != state.acceptWordKey ||
                 colorField.text != state.color ||
+                ignoreFileTypesField.text != state.ignoreFileTypes ||
+                execCommandAgentWrapperField.text != state.execCommandAgentWrapper ||
                 enabledCheckBox.isSelected != state.enabled
     }
 
@@ -85,6 +101,8 @@ class SupermavenSettingsConfigurable : Configurable {
             clearKey = clearKeyField.text,
             acceptWordKey = acceptWordKeyField.text,
             color = colorField.text,
+            ignoreFileTypes = ignoreFileTypesField.text,
+            execCommandAgentWrapper = execCommandAgentWrapperField.text,
             enabled = enabledCheckBox.isSelected
         )
         DynamicActionManager.instance.registerDynamicActions(config)
@@ -97,6 +115,8 @@ class SupermavenSettingsConfigurable : Configurable {
         clearKeyField.text = state.clearKey
         acceptWordKeyField.text = state.acceptWordKey
         colorField.text = state.color
+        ignoreFileTypesField.text = state.ignoreFileTypes
+        execCommandAgentWrapperField.text = state.execCommandAgentWrapper
         enabledCheckBox.isSelected = state.enabled
     }
 

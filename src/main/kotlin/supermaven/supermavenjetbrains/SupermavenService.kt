@@ -34,6 +34,7 @@ import supermaven.supermavenjetbrains.binary.LastState
 import supermaven.supermavenjetbrains.binary.DocumentState
 import supermaven.supermavenjetbrains.binary.AnyCompletion
 import supermaven.supermavenjetbrains.binary.ResponseItemKind
+import supermaven.supermavenjetbrains.config.SupermavenConfigService
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
@@ -51,7 +52,8 @@ class SupermavenService : Disposable {
     private var wantsPolling: Boolean = false
     private var lastProvideTime: Long = 0
     private var pollingTimer: Timer? = null
-    
+
+    private var config = SupermavenConfigService.getInstance()
     // State management (like BinaryLifecycle in nvim)
     private val changedDocumentList = ConcurrentHashMap<String, DocumentState>()
     private var lastState: LastState? = null
@@ -84,7 +86,7 @@ class SupermavenService : Disposable {
             createActivateNotification(activateUrl, includeFree, null)
         }
 
-        binaryHandler = BinaryHandler(binaryPath, ::createActivateNotificationWithoutProject)
+        binaryHandler = BinaryHandler(binaryPath,config.state.execCommandAgentWrapper, ::createActivateNotificationWithoutProject)
         binaryHandler?.start()
         setupDocumentListeners()
         startPolling()
@@ -215,11 +217,12 @@ class SupermavenService : Disposable {
                 if (!isRunning()) return
                 
                 // Get the file for this document
-                val file = FileDocumentManager.getInstance().getFile(event.document)
-                if (file == null) {
+                val file = FileDocumentManager.getInstance().getFile(event.document) ?: return
+
+                if (shouldIgnoreFile(file)) {
                     return
                 }
-                
+
                 // Find the active editor for this document
                 val editor = findEditorForDocument(event.document) ?: return
                 
@@ -233,15 +236,23 @@ class SupermavenService : Disposable {
                 if (!isRunning()) return
                 
                 val editor = event.editor
-                val file = FileDocumentManager.getInstance().getFile(editor.document)
-                if (file == null) {
+                val file = FileDocumentManager.getInstance().getFile(editor.document) ?: return
+
+                if (shouldIgnoreFile(file)) {
                     return
                 }
-                
-                // Логируем только каждое 10-е событие чтобы не спамить
+
                 handleCursorChange(editor, file)
             }
         }, disposable)
+    }
+
+    private fun shouldIgnoreFile(file: VirtualFile): Boolean {
+        val ignoreFileTypes = config.state.ignoreFileTypes
+        if (!ignoreFileTypes.isEmpty()) {
+            return ignoreFileTypes.split(",").contains(file.fileType.defaultExtension)
+        }
+        return false
     }
     
     private fun findEditorForDocument(document: com.intellij.openapi.editor.Document): Editor? {
@@ -267,21 +278,21 @@ class SupermavenService : Disposable {
     }
 
     private fun handleDocumentChange(editor: Editor, file: VirtualFile) {
-        onUpdate(editor, file, "text_changed")
+        onUpdate(editor, file )
     }
 
     private fun handleCursorChange(editor: Editor, file: VirtualFile) {
-        onUpdate(editor, file, "cursor")
+        onUpdate(editor, file)
     }
     
     // Similar to BinaryLifecycle:on_update in nvim
-    private fun onUpdate(editor: Editor, file: VirtualFile, eventType: String) {
+    private fun onUpdate(editor: Editor, file: VirtualFile) {
         val document = editor.document
         val bufferText = document.text
         val filePath = file.path
         
         if (bufferText.length > 10_000_000) {
-            logger.debug("File is too large, skipping")
+            logger.warn("File is too large, skipping")
             return
         }
         
